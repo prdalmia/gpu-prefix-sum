@@ -371,11 +371,11 @@ void gpu_prescan(unsigned int* d_out,
 	__syncthreads();
 }
  
- /*
+ 
 
 //unsigned int glbl_t_idx = blockDim.x * blockIdx.x + threadIdx.x;
-if(blockIdx.x == 0){
-unsigned int d_block_sum_val = d_block_sums[blockIdx.x];
+if(blockIdx.x < ((len+max_elems_per_block-1)/max_elems_per_block)){
+unsigned int d_block_sum_val = d_block_sums_dummy[blockIdx.x];
 
 //unsigned int d_in_val_0 = 0;
 //unsigned int d_in_val_1 = 0;
@@ -385,15 +385,15 @@ unsigned int d_block_sum_val = d_block_sums[blockIdx.x];
 unsigned int cpy_idx = 2 * blockIdx.x * blockDim.x + threadIdx.x;
 if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 {
-	temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
+	temp2[cpy_idx] = temp2[cpy_idx] + d_block_sum_val;
 	if (cpy_idx + blockDim.x < ((len+max_elems_per_block-1)/max_elems_per_block))
-		temp1[cpy_idx + blockDim.x] = temp1[cpy_idx + blockDim.x] + d_block_sum_val;
+		temp2[cpy_idx + blockDim.x] = temp2[cpy_idx + blockDim.x] + d_block_sum_val;
 }
 }
 grid.sync();
-d_out = temp;
-d_block_sums = temp1;
-*/
+d_out = temp1;
+d_block_sums = temp2;
+
 }
 
 void sum_scan_naive(unsigned int* const d_out,
@@ -492,7 +492,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 */
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-	//gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
+	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));
 }
