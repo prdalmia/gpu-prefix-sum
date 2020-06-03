@@ -372,7 +372,7 @@ void gpu_prescan(unsigned int* d_out,
 }
  
  
-
+/*
 //unsigned int glbl_t_idx = blockDim.x * blockIdx.x + threadIdx.x;
 if(blockIdx.x < ((len+max_elems_per_block-1)/max_elems_per_block)){
 unsigned int d_block_sum_val = d_block_sums_dummy[blockIdx.x];
@@ -391,9 +391,9 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 }
 }
 grid.sync();
-
-d_out = temp1;
-d_block_sums = temp2;
+*/
+d_out = temp2;
+d_block_sums =  d_block_sums_dummy
 
 }
 
