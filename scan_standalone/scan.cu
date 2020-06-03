@@ -351,6 +351,7 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums_2[id] = d_block_sums[id];
 	//printf("BLock sum are %d and a is %d\n", d_block_sums[2], a);
 	}
+	__threadfence();
 	if(a == len){
 	temp1 = d_out;
 	d_out = d_block_sums;
@@ -359,7 +360,7 @@ void gpu_prescan(unsigned int* d_out,
 	}
 	
 	__syncthreads();
-	__threadfence();
+	
 	grid.sync();
 	}
 
