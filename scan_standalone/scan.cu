@@ -349,7 +349,8 @@ void gpu_prescan(unsigned int* d_out,
 	grid.sync();
 	if(a==len && id < gridDim.x){
 	d_block_sums_2[id] = d_block_sums[id];
-	if(id == 0){
+	}
+	if(a == len && id == 0){
 	temp1 = d_out;
 	d_out = d_block_sums;
 	d_in = d_block_sums_2;
