@@ -3,7 +3,7 @@
 #include <cooperative_groups.h>
 namespace cg = cooperative_groups;
 
-#define MAX_BLOCK_SZ 128
+#define MAX_BLOCK_SZ 64
 #define NUM_BANKS 32
 #define LOG_NUM_BANKS 5
 
