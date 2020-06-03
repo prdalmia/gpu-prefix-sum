@@ -220,9 +220,7 @@ __global__
 void gpu_prescan(unsigned int* d_out,
 	unsigned int*  d_in,
 	unsigned int*  d_block_sums,
-	unsigned int*  d_block_sums_2,
 	unsigned int*  d_block_sums_dummy, 
-	unsigned int*  d_block_sums_dummy_2,
 	const unsigned int len,
 	const unsigned int shmem_sz,
 	const unsigned int max_elems_per_block)
@@ -230,7 +228,7 @@ void gpu_prescan(unsigned int* d_out,
 	// Allocated on invocation
 	extern __shared__ unsigned int s_out[];
 	unsigned int* temp1;
-	unsigned int* temp2;
+	//unsigned int* temp2;
 	int thid;
 	cg::grid_group grid = cg::this_grid();
 	int id = blockIdx.x * blockDim.x + threadIdx.x; 
@@ -459,7 +457,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
 	void *kernelArgs[] = {
-        (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums, (void *)&d_block_sums_2,  (void *)&d_block_sums_dummy, (void *)&d_block_sums_dummy_2, (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
+        (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums,  (void *)&d_block_sums_dummy,  (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
 	};
 	cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
 	cudaDeviceSynchronize();
