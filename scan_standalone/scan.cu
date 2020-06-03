@@ -228,13 +228,13 @@ void gpu_prescan(unsigned int* d_out,
 	// Allocated on invocation
 	extern __shared__ unsigned int s_out[];
 	unsigned int* temp1;
-	//unsigned int* temp2;
+	unsigned int* temp2;
 	int thid;
 	cg::grid_group grid = cg::this_grid();
 	//int id = blockIdx.x * blockDim.x + threadIdx.x; 
 	int ai;
 	int bi;
-    for(int a = len; a > 10; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
+    for(int a = len; a >= 1; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
 	thid = threadIdx.x;
 	ai = thid;
 	bi = thid + blockDim.x;
@@ -362,18 +362,16 @@ void gpu_prescan(unsigned int* d_out,
 	}
 	__syncthreads();
 
-	}
-
-	
-/*
-	if( a<len){
-	temp1 = d_out;
+	if( a<len && a >1){
+	temp2 = d_out;
 	d_out = d_dummy_sums;
 	d_in = d_dummy_sums;
 	d_block_sums = d_block_sums_dummy_2;
 	}
+	__syncthreads();
  }
- grid.sync();
+ 
+ /*
 
 //unsigned int glbl_t_idx = blockDim.x * blockIdx.x + threadIdx.x;
 if(blockIdx.x == 0){
