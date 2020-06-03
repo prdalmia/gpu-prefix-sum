@@ -300,7 +300,7 @@ void gpu_prescan(unsigned int* d_out,
 
 			s_out[bi] += s_out[ai];
 			if(a < len && id == 0){
-				printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+				printf("s[out] is %d and a is %d\n", s_out[bi], bi);	
 			}
 		}
 		offset <<= 1;
@@ -349,7 +349,6 @@ void gpu_prescan(unsigned int* d_out,
 	grid.sync();
 	if(a==len && id < gridDim.x){
 	d_block_sums_2[id] = d_block_sums[id];
-	printf("BLock sum are %d\n", d_block_sums[id]);
 	}
 	__syncthreads();
 	__threadfence();
