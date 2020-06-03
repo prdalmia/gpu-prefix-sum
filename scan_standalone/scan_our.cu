@@ -427,7 +427,7 @@ void sum_scan_blelloch(unsigned int* const d_out,
 																	d_block_sums,
 																	d_block_sums_dummy_2,
                                                                     d_block_sums_2,
-                                                                    d_dummy_sums, 
+                                                                    d_block_sums_dummy, 
 																	numElems, 
 																	shmem_sz,
 																	max_elems_per_block);
