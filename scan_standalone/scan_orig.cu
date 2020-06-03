@@ -383,7 +383,6 @@ void sum_scan_blelloch(unsigned int* const d_out,
 	//  for the block sums
 	else
 	{
-		checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * h_in_len, cudaMemcpyDeviceToHost));
 		unsigned int* d_in_block_sums;
 		checkCudaErrors(cudaMalloc(&d_in_block_sums, sizeof(unsigned int) * grid_sz));
 		checkCudaErrors(cudaMemcpy(d_in_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToDevice));
