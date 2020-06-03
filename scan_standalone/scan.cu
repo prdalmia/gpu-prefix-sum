@@ -393,7 +393,7 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 grid.sync();
 */
 d_out = temp2;
-d_block_sums =  d_block_sums_dummy
+d_block_sums =  d_block_sums_dummy;
 
 }
 
