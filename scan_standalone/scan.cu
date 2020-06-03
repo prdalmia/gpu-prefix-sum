@@ -330,7 +330,8 @@ void gpu_prescan(unsigned int* d_out,
 	}
     }
 	grid.sync();
-	
+	}
+/*	
 	if(a==len){
 	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
 	temp = d_out;
@@ -367,6 +368,7 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 grid.sync();
 d_out = temp;
 d_block_sums = temp1;
+*/
 }
 
 void sum_scan_naive(unsigned int* const d_out,
@@ -440,20 +442,20 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//  for the block sums
 	
 	//// Uncomment to examine block sums
-	//unsigned int* h_block_sums = new unsigned int[grid_sz];
-	//checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-	//std::cout << "Block sums: ";
-	//for (int i = 0; i < grid_sz; ++i)
-	//{
-	//	std::cout << h_block_sums[i] << ", ";
-	//}
-	//std::cout << std::endl;
-	//std::cout << "Block sums length: " << grid_sz << std::endl;
-	//delete[] h_block_sums;
+	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	std::cout << "Block sums: ";
+	for (int i = 0; i < grid_sz; ++i)
+	{
+		std::cout << h_block_sums[i] << ", ";
+	}
+	std::cout << std::endl;
+	std::cout << "Block sums length: " << grid_sz << std::endl;
+	delete[] h_block_sums;
 
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
+	//gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));
 }

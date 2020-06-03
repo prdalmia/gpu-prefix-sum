@@ -329,7 +329,6 @@ void sum_scan_blelloch(unsigned int* const d_out,
 {
 	// Zero out d_out
 	checkCudaErrors(cudaMemset(d_out, 0, numElems * sizeof(unsigned int)));
-
 	// Set up number of threads and blocks
 	
 	unsigned int block_sz = MAX_BLOCK_SZ / 2;
@@ -384,28 +383,29 @@ void sum_scan_blelloch(unsigned int* const d_out,
 	//  for the block sums
 	else
 	{
+		checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * h_in_len, cudaMemcpyDeviceToHost));
 		unsigned int* d_in_block_sums;
 		checkCudaErrors(cudaMalloc(&d_in_block_sums, sizeof(unsigned int) * grid_sz));
 		checkCudaErrors(cudaMemcpy(d_in_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToDevice));
-		sum_scan_blelloch(d_block_sums, d_in_block_sums, grid_sz);
+		//sum_scan_blelloch(d_block_sums, d_in_block_sums, grid_sz);
 		checkCudaErrors(cudaFree(d_in_block_sums));
 	}
 	
 	//// Uncomment to examine block sums
-	//unsigned int* h_block_sums = new unsigned int[grid_sz];
-	//checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-	//std::cout << "Block sums: ";
-	//for (int i = 0; i < grid_sz; ++i)
-	//{
-	//	std::cout << h_block_sums[i] << ", ";
-	//}
-	//std::cout << std::endl;
-	//std::cout << "Block sums length: " << grid_sz << std::endl;
-	//delete[] h_block_sums;
+	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	std::cout << "Block sums: ";
+	for (int i = 0; i < grid_sz; ++i)
+	{
+		std::cout << h_block_sums[i] << ", ";
+	}
+	std::cout << std::endl;
+	std::cout << "Block sums length: " << grid_sz << std::endl;
+	delete[] h_block_sums;
 
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
+	//gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	checkCudaErrors(cudaFree(d_block_sums));
 }
