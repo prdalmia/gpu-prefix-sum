@@ -351,11 +351,12 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums_2[id] = d_block_sums[id];
 	//printf("BLock sum are %d and a is %d\n", d_block_sums[2], a);
 	}
+	__syncthreads();
 	__threadfence();
 	if(a == len){
 	temp1 = d_out;
 	d_out = d_block_sums;
-	d_in = d_block_sums_2;
+	d_in = d_block_sums;
 	d_block_sums = d_block_sums_dummy;
 	}
 	__threadfence();
