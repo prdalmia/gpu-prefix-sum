@@ -444,7 +444,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//// Uncomment to examine block sums
 	int max_elems = grid_sz/max_elems_per_block;
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums_dummy, sizeof(unsigned int) * max_elems, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums_dummy, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	std::cout << "Block sums: ";
 	for (int i = 0; i < max_elems; ++i)
 	{
