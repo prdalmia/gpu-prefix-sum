@@ -462,6 +462,7 @@ void sum_scan_blelloch(unsigned int* d_out,
         (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums, (void *)&d_block_sums_2,  (void *)&d_block_sums_dummy, (void *)&d_block_sums_dummy_2, (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
 	};
 	cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
+	/*
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
 																	d_block_sums,
@@ -471,7 +472,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 																	numElems, 
 																	shmem_sz,
 																	max_elems_per_block);
-
+*/
 	// Sum scan total sums produced by each block
 	// Use basic implementation if number of total sums is <= 2 * block_sz
 	//  (This requires only one block to do the scan)
