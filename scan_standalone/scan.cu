@@ -342,7 +342,6 @@ void gpu_prescan(unsigned int* d_out,
 	__syncthreads();
 }
 	
-}
 /*
 	if( a<len){
 	temp1 = d_out;
