@@ -349,7 +349,7 @@ void gpu_prescan(unsigned int* d_out,
 	grid.sync();
 	if(a==len && id < gridDim.x){
 	d_block_sums_2[id] = d_block_sums[id];
-	//printf("BLock sum are %d and a is %d\n", d_block_sums[2], a);
+	printf("BLock sum are %d and a is %d\n", d_block_sums, a);
 	}
 	__syncthreads();
 	__threadfence();
