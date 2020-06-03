@@ -298,7 +298,7 @@ void gpu_prescan(unsigned int* d_out,
 			bi += CONFLICT_FREE_OFFSET(bi);
 
 			s_out[bi] += s_out[ai];
-			if(a < len && id == 0){
+			if(a < len && threadIdx.x + blockDim.x*blockIdx.x == 0){
 				printf("s[out] is %d and a is %d\n", s_out[bi], bi);	
 			}
 		}
