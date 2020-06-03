@@ -333,9 +333,9 @@ void gpu_prescan(unsigned int* d_out,
 	if(a==len && id ==0){
 	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
 	temp = d_out;
-	d_out = d_block_sums;
-	d_in = d_block_sums_2;
-	d_block_sums = d_block_sums_dummy;
+	//d_out = d_block_sums;
+	//d_in = d_block_sums_2;
+	//d_block_sums = d_block_sums_dummy;
 	}
 	__syncthreads();
 }
