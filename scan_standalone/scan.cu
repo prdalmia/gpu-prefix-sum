@@ -235,7 +235,7 @@ void gpu_prescan(unsigned int* d_out,
 	int id = blockIdx.x * blockDim.x + threadIdx.x; 
 	int ai;
 	int bi;
-    for(int a = len; a > 1; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
+    for(int a = len; a > 10; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
 	thid = threadIdx.x;
 	ai = thid;
 	bi = thid + blockDim.x;
