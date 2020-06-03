@@ -1,4 +1,5 @@
 #include "scan.h"
+#include <stdio.h>
 
 #define MAX_BLOCK_SZ 1024
 #define NUM_BANKS 32
