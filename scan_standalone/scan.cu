@@ -339,7 +339,7 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums = d_block_sums_dummy;
 	}
 }
-	_syncthreads();
+	__syncthreads();
 }
 	
 }
