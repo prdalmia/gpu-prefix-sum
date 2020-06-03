@@ -262,7 +262,7 @@ void gpu_prescan(unsigned int* d_out,
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
 	
 		if( a == 2560){
-		printf("s[out] ai is %d and a is %d\n", d_block_sums_2[cpy_idx], a);
+		printf("s[out] ai is %d and a is %d\n", d_out[cpy_idx], a);
 		}
 		
 		if (cpy_idx + blockDim.x < a){
