@@ -342,8 +342,8 @@ void gpu_prescan(unsigned int* d_out,
 	if( a<len){
 	temp1 = d_out;
 	temp2 = d_in;
-	dout = d_dummy_sums;
-	din = d_dummy_sums;
+	d_out = d_dummy_sums;
+	d_in = d_dummy_sums;
 	d_block_sums = d_block_sums_dummy_2;
 	}
  }
@@ -359,7 +359,7 @@ unsigned int d_block_sum_val = d_block_sums[blockIdx.x];
 // Simple implementation's performance is not significantly (if at all)
 //  better than previous verbose implementation
 unsigned int cpy_idx = 2 * blockIdx.x * blockDim.x + threadIdx.x;
-if (cpy_idx < (len+max_elems_per_block-1)/max_elems_per_block))
+if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 {
 	temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
 	if (cpy_idx + blockDim.x < numElems)
@@ -367,7 +367,7 @@ if (cpy_idx < (len+max_elems_per_block-1)/max_elems_per_block))
 }
 }
 grid.sync();
-dout = temp;
+d_out = temp;
 d_block_sums = temp1;
 }
 
