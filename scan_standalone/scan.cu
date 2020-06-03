@@ -362,16 +362,13 @@ void gpu_prescan(unsigned int* d_out,
 	d_in = d_block_sums;
 	d_block_sums = d_block_sums_dummy;
 	}
-	__syncthreads();
-/*
-	if( a<len && a >1){
+	else if ( a<len && a >1){
 	temp2 = d_out;
 	d_out = d_block_sums_dummy;
 	d_in = d_block_sums_dummy;
 	d_block_sums = d_block_sums_dummy_2;
 	}
 	__syncthreads();
-*/
 }
  
  /*
