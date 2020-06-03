@@ -331,7 +331,7 @@ void gpu_prescan(unsigned int* d_out,
     }
 	grid.sync();
 	if(a==len && id < gridDim.x){
-	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
+	d_block_sums_2[id] = d_block_sums[id];
 	if(id == 0){
 	temp = d_out;
 	d_out = d_block_sums;
