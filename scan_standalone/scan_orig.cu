@@ -278,7 +278,7 @@ void gpu_prescan(unsigned int* const d_out,
 
 			s_out[bi] += s_out[ai];
 			if(gridDim.x == 3 && blockDim.x*blockIdx.x+threadIdx.x == 0){
-				printf("s[out] is %d and a is %d\n", s_out[ai], bi);	
+				//printf("s[out] is %d and a is %d\n", s_out[ai], bi);	
 			}
 		}
 		offset <<= 1;
