@@ -330,14 +330,17 @@ void gpu_prescan(unsigned int* d_out,
 	}
     }
 	grid.sync();
-	if(a==len && id ==0){
+	if(a==len){
 	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
+	if(id == 0){
 	temp = d_out;
-	//d_out = d_block_sums;
-	//d_in = d_block_sums_2;
-	//d_block_sums = d_block_sums_dummy;
+	d_out = d_block_sums;
+	d_in = d_block_sums_2;
+	d_block_sums = d_block_sums_dummy;
 	}
 	__syncthreads();
+}
+	
 }
 /*
 	if( a<len){
