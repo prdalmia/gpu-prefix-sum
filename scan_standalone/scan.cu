@@ -392,24 +392,8 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 }
 grid.sync();
 
-	unsigned int d_block_sum_val = temp2[blockIdx.x];
-	
-	//unsigned int d_in_val_0 = 0;
-	//unsigned int d_in_val_1 = 0;
-	
-	// Simple implementation's performance is not significantly (if at all)
-	//  better than previous verbose implementation
-	unsigned int cpy_idx = 2 * blockIdx.x * blockDim.x + threadIdx.x;
-	if (cpy_idx < len)
-	{
-		temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
-		if (cpy_idx + blockDim.x < len)
-			temp1[cpy_idx + blockDim.x] = temp1[cpy_idx + blockDim.x] + d_block_sum_val;
-	}
-	
-	grid.sync();
-
-	d_out = temp1;
+d_out = temp1;
+d_block_sums = temp2;
 
 }
 
@@ -497,14 +481,24 @@ void sum_scan_blelloch(unsigned int* d_out,
 
 	int max_elems = grid_sz/max_elems_per_block;
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	std::cout << "Block sums: ";
-	for (int i = 0; i < grid_sz; ++i)
+	for (int i = 0; i < max_elems; ++i)
 	{
 		std::cout << h_block_sums[i] << std::endl;
 	}
 	std::cout << std::endl;
 	std::cout << "Block sums length: " << grid_sz << std::endl;
+	delete[] h_block_sums;
+	std::cout << "out sums: ";
+	for (int i = 0; i < grid_sz; ++i)
+	{
+		std::cout << h_block_sums_out[i] << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << "out sums length: " << grid_sz << std::endl;
 	delete[] h_block_sums;
 
 	// Add each block's total sum to its scan output
