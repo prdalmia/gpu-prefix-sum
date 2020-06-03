@@ -385,20 +385,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	
 	
 	//// Uncomment to examine block sums
-	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-	/*
-	if(grid_sz < 10 && grid_sz > 1){
-	std::cout << "Block sums: ";
-	for (int i = 0; i < grid_sz; ++i)
-	{
-		std::cout << h_block_sums[i] << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << "Block sums length: " << grid_sz << std::endl;
-	delete[] h_block_sums;
-}
-*/
+	
 	if (grid_sz <= max_elems_per_block)
 	{
 		unsigned int* d_dummy_blocks_sums;
@@ -430,5 +417,18 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	// in order to get the final, global scanned array
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
+	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	
+	if(grid_sz < 2000){
+	std::cout << "Block sums: ";
+	for (int i = 0; i < grid_sz; ++i)
+	{
+		std::cout << h_block_sums[i] << std::endl;
+	}
+	std::cout << std::endl;
+	std::cout << "Block sums length: " << grid_sz << std::endl;
+	delete[] h_block_sums;
+}	
 	checkCudaErrors(cudaFree(d_block_sums));
 }
