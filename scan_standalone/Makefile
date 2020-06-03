@@ -1,5 +1,5 @@
-CUDA_INCLUDEPATH=/usr/local/cuda-5.0/include
-NVCC_OPTS=-O3 -arch=sm_37 -Xcompiler -Wall -Xcompiler -Wextra -m64
+CUDA_INCLUDEPATH=/pa/hal/private/installs/cuda-9.1/
+NVCC_OPTS=-O3 -arch=sm_70 -Xcompiler -Wall -Xcompiler -Wextra -m64
 
 scan: main.cu scan.o Makefile
 	nvcc -o scan main.cu scan.o $(NVCC_OPTS)
