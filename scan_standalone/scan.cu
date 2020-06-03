@@ -403,7 +403,7 @@ grid.sync();
 	if (cpy_idx < len)
 	{
 		temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
-		if (cpy_idx + blockDim.x < ((len+max_elems_per_block-1)/max_elems_per_block))
+		if (cpy_idx + blockDim.x < len)
 			temp1[cpy_idx + blockDim.x] = temp1[cpy_idx + blockDim.x] + d_block_sum_val;
 	}
 	
