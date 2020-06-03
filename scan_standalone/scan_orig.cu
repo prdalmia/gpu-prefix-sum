@@ -241,9 +241,6 @@ void gpu_prescan(unsigned int* const d_out,
 	if (cpy_idx < len)
 	{
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
-		if( gridDim.x == 3){
-		printf("D block sum input is %d and a is %d\n", d_in[cpy_idx], gridDim.x);
-		}
 		if (cpy_idx + blockDim.x < len)
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
 	}
@@ -266,6 +263,9 @@ void gpu_prescan(unsigned int* const d_out,
 
 		if (thid < d)
 		{
+			if(gridDim.x == 3 && id == 0){
+				printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+			}
 			int ai = offset * ((thid << 1) + 1) - 1;
 			int bi = offset * ((thid << 1) + 2) - 1;
 			ai += CONFLICT_FREE_OFFSET(ai);
