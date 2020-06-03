@@ -316,10 +316,10 @@ void gpu_prescan(unsigned int* d_out,
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)];
 		s_out[max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)] = 0;
-		if( a < len){
-		printf("s[finalout] is %d and index is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
-		+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1), a);
-		}
+		//if( a < len){
+		//printf("s[finalout] is %d and index is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
+		//+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1), a);
+		//s}
 	}
 
 	// Downsweep step
@@ -391,8 +391,25 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 }
 }
 grid.sync();
-d_out = temp1;
-d_block_sums = temp2;
+
+	unsigned int d_block_sum_val = temp2[blockIdx.x];
+	
+	//unsigned int d_in_val_0 = 0;
+	//unsigned int d_in_val_1 = 0;
+	
+	// Simple implementation's performance is not significantly (if at all)
+	//  better than previous verbose implementation
+	unsigned int cpy_idx = 2 * blockIdx.x * blockDim.x + threadIdx.x;
+	if (cpy_idx < len)
+	{
+		temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
+		if (cpy_idx + blockDim.x < ((len+max_elems_per_block-1)/max_elems_per_block))
+			temp1[cpy_idx + blockDim.x] = temp1[cpy_idx + blockDim.x] + d_block_sum_val;
+	}
+	
+	grid.sync();
+
+	d_out = temp1;
 
 }
 
