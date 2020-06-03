@@ -317,7 +317,7 @@ void gpu_prescan(unsigned int* d_out,
 		s_out[max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)] = 0;
 		if( a < len){
-		printf("s[finalout] is %d and index is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
+		//printf("s[finalout] is %d and index is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
 		+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1), a);
 		}
 	}
