@@ -358,6 +358,7 @@ void gpu_prescan(unsigned int* d_out,
 	}
 
 	__syncthreads();
+	__threadfence();
 	}
 
 	
