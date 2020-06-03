@@ -265,9 +265,15 @@ void gpu_prescan(unsigned int* d_out,
 		printf("D block sum input is %d and a is %d\n", d_in[cpy_idx], a);
 		}
 	*/	
-		if (cpy_idx + blockDim.x < a)
+		if (cpy_idx + blockDim.x < a){
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
-	}
+		
+		if( a < len){
+		printf("s[out] bi is %d and a is %d\n", d_in[cpy_idx + blockDim.x], a);
+		}
+		
+		}
+		}
 
 	// For both upsweep and downsweep:
 	// Sequential indices with conflict free padding

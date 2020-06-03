@@ -241,8 +241,12 @@ void gpu_prescan(unsigned int* const d_out,
 	if (cpy_idx < len)
 	{
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
-		if (cpy_idx + blockDim.x < len)
+		if (cpy_idx + blockDim.x < len){
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
+			if( gridDim.x == 3){
+				printf("s[out] bi is %d and a is %d\n", d_in[cpy_idx + blockDim.x], a);
+				}
+			}
 	}
 
 	// For both upsweep and downsweep:
