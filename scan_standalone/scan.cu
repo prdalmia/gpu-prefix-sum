@@ -283,9 +283,6 @@ void gpu_prescan(unsigned int* d_out,
 	int offset = 1;
 	for (int d = max_elems_per_block >> 1; d > 0; d >>= 1)
 	{
-		if(a < len && id == 0){
-			printf("s[out] is %d and a is %d\n", s_out[bi], a);	
-		}
 		__syncthreads();
 
 		if (thid < d)
@@ -296,7 +293,9 @@ void gpu_prescan(unsigned int* d_out,
 			bi += CONFLICT_FREE_OFFSET(bi);
 
 			s_out[bi] += s_out[ai];
-			
+			if(a < len && id == 0){
+				printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+			}
 		}
 		offset <<= 1;
 	}
