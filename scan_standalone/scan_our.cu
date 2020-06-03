@@ -424,7 +424,10 @@ void sum_scan_blelloch(unsigned int* const d_out,
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
-																	d_block_sums, 
+																	d_block_sums,
+																	d_block_sums_dummy_2,
+                                                                    d_block_sums_2,
+                                                                    d_dummy_sums, 
 																	numElems, 
 																	shmem_sz,
 																	max_elems_per_block);
