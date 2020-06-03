@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	std::clock_t start;
 	double duration;
 
-	size_t h_in_len = 0;
+	unsigned int h_in_len = 0;
 
 		h_in_len = std::atoi(argv[1]);
 		std::cout << "h_in size: " << h_in_len << std::endl;
