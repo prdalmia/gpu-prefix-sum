@@ -5,7 +5,7 @@ scan: main.cu scan.o Makefile
 	nvcc -o scan main.cu scan.o $(NVCC_OPTS)
 
 scan.o: scan.cu
-	nvcc -c scan.cu $(NVCC_OPTS)
+	nvcc -rdc=true -c scan.cu $(NVCC_OPTS)
 
 clean:
 	rm -f *.o scan
