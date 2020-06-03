@@ -29,7 +29,7 @@ int main()
 
 	unsigned int h_in_len = 0;
 
-		h_in_len = 2560
+		h_in_len = 2560;
 		std::cout << "h_in size: " << h_in_len << std::endl;
 
 		// Generate input
