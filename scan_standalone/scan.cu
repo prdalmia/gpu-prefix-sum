@@ -263,14 +263,14 @@ void gpu_prescan(unsigned int* d_out,
 	{
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
 	
-		if( a == 2560){
+		if( a == 2560 && threadIdx.x){
 		printf("s[out] ai is %d and a is %d\n", d_block_sums[cpy_idx], a);
 		}
 		
 		if (cpy_idx + blockDim.x < a){
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
 		
-		if( a == 2560){
+		if( a == 2560 && threadIdx.x){
 		printf("s[out] bi is %d and a is %d\n", d_block_sums[cpy_idx + blockDim.x], a);
 		}
 		
@@ -353,7 +353,7 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums_2[id] = d_block_sums[id];
 	//printf("BLock sum are %d and a is %d\n", d_block_sums[2], a);
 	}
-	if(a == len && id == 0){
+	if(a == len){
 	temp1 = d_out;
 	d_out = d_block_sums;
 	d_in = d_block_sums_2;
