@@ -300,11 +300,7 @@ void gpu_prescan(unsigned int* d_out,
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)];
 		s_out[max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)] = 0;
-		
-		if(a <len){
-
-		printf("D block sums is %d\n", d_block_sums[blockIdx.x]);	
-		}
+		printf("D block sums is %d and a is %d\n", d_block_sums[blockIdx.x], a);	
 	}
 
 	// Downsweep step
