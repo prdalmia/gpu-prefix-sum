@@ -1,6 +1,4 @@
 #include "scan.h"
-#include <cooperative_groups.h>
-namespace cg = cooperative_groups;
 
 #define MAX_BLOCK_SZ 1024
 #define NUM_BANKS 32
@@ -12,9 +10,6 @@ namespace cg = cooperative_groups;
 #else
 #define CONFLICT_FREE_OFFSET(n) ((n) >> LOG_NUM_BANKS)
 #endif
-
-
-
 
 __global__
 void gpu_sum_scan_naive(unsigned int* const d_out,
@@ -164,9 +159,6 @@ void gpu_sum_scan_blelloch(unsigned int* const d_out,
 		if (cpy_idx + blockDim.x < numElems)
 			d_out[cpy_idx + blockDim.x] = s_out[threadIdx.x + blockDim.x];
 	}
-
-
-
 }
 
 __global__
@@ -216,32 +208,22 @@ void gpu_add_block_sums(unsigned int* const d_out,
 // Modified version of Mark Harris' implementation of the Blelloch scan
 //  according to https://www.mimuw.edu.pl/~ps209291/kgkp/slides/scan.pdf
 __global__
-void gpu_prescan(unsigned int* d_out,
-	unsigned int*  d_in,
-	unsigned int*  d_block_sums,
-	unsigned int*  d_block_sums_dummy_2,
-	unsigned int*  d_block_sums_2,
-	unsigned int*  d_dummy_sums,
+void gpu_prescan(unsigned int* const d_out,
+	const unsigned int* const d_in,
+	unsigned int* const d_block_sums,
 	const unsigned int len,
 	const unsigned int shmem_sz,
 	const unsigned int max_elems_per_block)
 {
 	// Allocated on invocation
 	extern __shared__ unsigned int s_out[];
-	unsigned int* temp;
-	unsigned int* temp1;
-	int thid;
-	cg::grid_group grid = cg::this_grid();
-	int id = blockIdx.x * blockDim.x + threadIdx.x; 
-	int ai;
-	int bi;
-    for(int a = len; a > 1; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
-	thid = threadIdx.x;
-	ai = thid;
-	bi = thid + blockDim.x;
+
+	int thid = threadIdx.x;
+	int ai = thid;
+	int bi = thid + blockDim.x;
+
 	// Zero out the shared memory
 	// Helpful especially when input size is not power of two
-	
 	s_out[thid] = 0;
 	s_out[thid + blockDim.x] = 0;
 	// If CONFLICT_FREE_OFFSET is used, shared memory
@@ -250,16 +232,15 @@ void gpu_prescan(unsigned int* d_out,
 		s_out[thid + max_elems_per_block] = 0;
 
 	__syncthreads();
-
-	if(blockIdx.x < ((a+max_elems_per_block-1)/max_elems_per_block)){
+	
 	// Copy d_in to shared memory
 	// Note that d_in's elements are scattered into shared memory
 	//  in light of avoiding bank conflicts
 	unsigned int cpy_idx = max_elems_per_block * blockIdx.x + threadIdx.x;
-	if (cpy_idx < a)
+	if (cpy_idx < len)
 	{
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
-		if (cpy_idx + blockDim.x < a)
+		if (cpy_idx + blockDim.x < len)
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
 	}
 
@@ -322,51 +303,12 @@ void gpu_prescan(unsigned int* d_out,
 	__syncthreads();
 
 	// Copy contents of shared memory to global memory
-	if (cpy_idx < a)
+	if (cpy_idx < len)
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
-		if (cpy_idx + blockDim.x < a)
+		if (cpy_idx + blockDim.x < len)
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
 	}
-    }
-	grid.sync();
-	
-	if(a==len){
-	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
-	temp = d_out;
-	d_out = d_block_sums;
-	d_in = d_block_sums_2;
-	d_block_sums = d_dummy_sums;
-	}
-	if( a<len){
-	temp1 = d_out;
-	d_out = d_dummy_sums;
-	d_in = d_dummy_sums;
-	d_block_sums = d_block_sums_dummy_2;
-	}
- }
- grid.sync();
-
-//unsigned int glbl_t_idx = blockDim.x * blockIdx.x + threadIdx.x;
-if(blockIdx.x == 0){
-unsigned int d_block_sum_val = d_block_sums[blockIdx.x];
-
-//unsigned int d_in_val_0 = 0;
-//unsigned int d_in_val_1 = 0;
-
-// Simple implementation's performance is not significantly (if at all)
-//  better than previous verbose implementation
-unsigned int cpy_idx = 2 * blockIdx.x * blockDim.x + threadIdx.x;
-if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
-{
-	temp1[cpy_idx] = temp1[cpy_idx] + d_block_sum_val;
-	if (cpy_idx + blockDim.x < ((len+max_elems_per_block-1)/max_elems_per_block))
-		temp1[cpy_idx + blockDim.x] = temp1[cpy_idx + blockDim.x] + d_block_sum_val;
-}
-}
-grid.sync();
-d_out = temp;
-d_block_sums = temp1;
 }
 
 void sum_scan_naive(unsigned int* const d_out,
@@ -381,8 +323,8 @@ void sum_scan_naive(unsigned int* const d_out,
 	gpu_sum_scan_naive << <gridSz, blockSz >> >(d_out, d_in, numElems);
 }
  
-void sum_scan_blelloch(unsigned int* d_out,
-	unsigned int*  d_in,
+void sum_scan_blelloch(unsigned int* const d_out,
+	const unsigned int* const d_in,
 	const size_t numElems)
 {
 	// Zero out d_out
@@ -409,26 +351,14 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// Allocate memory for array of total sums produced by each block
 	// Array length must be the same as number of blocks
 	unsigned int* d_block_sums;
-	unsigned int* d_block_sums_dummy_2;
-	unsigned int* d_block_sums_2;
-	unsigned int* d_block_sums_dummy;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMalloc(&d_block_sums_2, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMemset(d_block_sums_2, 0, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMalloc(&d_block_sums_dummy, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMemset(d_block_sums_dummy, 0, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMalloc(&d_block_sums_dummy_2, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMemset(d_block_sums_dummy_2, 0, sizeof(unsigned int) * grid_sz));
 
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
-																	d_block_sums,
-																	d_block_sums_dummy_2,
-                                                                    d_block_sums_2,
-                                                                    d_block_sums_dummy, 
+																	d_block_sums, 
 																	numElems, 
 																	shmem_sz,
 																	max_elems_per_block);
@@ -436,8 +366,30 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// Sum scan total sums produced by each block
 	// Use basic implementation if number of total sums is <= 2 * block_sz
 	//  (This requires only one block to do the scan)
+	if (grid_sz <= max_elems_per_block)
+	{
+		unsigned int* d_dummy_blocks_sums;
+		checkCudaErrors(cudaMalloc(&d_dummy_blocks_sums, sizeof(unsigned int)));
+		checkCudaErrors(cudaMemset(d_dummy_blocks_sums, 0, sizeof(unsigned int)));
+		//gpu_sum_scan_blelloch<<<1, block_sz, sizeof(unsigned int) * max_elems_per_block>>>(d_block_sums, d_block_sums, d_dummy_blocks_sums, grid_sz);
+		gpu_prescan<<<1, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_block_sums, 
+																	d_block_sums, 
+																	d_dummy_blocks_sums, 
+																	grid_sz, 
+																	shmem_sz,
+																	max_elems_per_block);
+		checkCudaErrors(cudaFree(d_dummy_blocks_sums));
+	}
 	// Else, recurse on this same function as you'll need the full-blown scan
 	//  for the block sums
+	else
+	{
+		unsigned int* d_in_block_sums;
+		checkCudaErrors(cudaMalloc(&d_in_block_sums, sizeof(unsigned int) * grid_sz));
+		checkCudaErrors(cudaMemcpy(d_in_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToDevice));
+		sum_scan_blelloch(d_block_sums, d_in_block_sums, grid_sz);
+		checkCudaErrors(cudaFree(d_in_block_sums));
+	}
 	
 	//// Uncomment to examine block sums
 	//unsigned int* h_block_sums = new unsigned int[grid_sz];
@@ -455,5 +407,5 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// in order to get the final, global scanned array
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
-	//checkCudaErrors(cudaFree(d_block_sums));
+	checkCudaErrors(cudaFree(d_block_sums));
 }
