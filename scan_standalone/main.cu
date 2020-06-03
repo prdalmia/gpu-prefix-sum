@@ -20,7 +20,7 @@ void cpu_sum_scan(unsigned int* const h_out,
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	// Set up clock for timing comparisons
 	srand(time(NULL));
@@ -29,7 +29,7 @@ int main()
 
 	unsigned int h_in_len = 0;
 
-		h_in_len = 2560;
+		h_in_len = std::atoi(argv[1];
 		std::cout << "h_in size: " << h_in_len << std::endl;
 
 		// Generate input
