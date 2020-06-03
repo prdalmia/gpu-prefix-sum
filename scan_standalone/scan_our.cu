@@ -216,12 +216,12 @@ void gpu_add_block_sums(unsigned int* const d_out,
 // Modified version of Mark Harris' implementation of the Blelloch scan
 //  according to https://www.mimuw.edu.pl/~ps209291/kgkp/slides/scan.pdf
 __global__
-void gpu_prescan(unsigned int* const d_out,
-	unsigned int* const d_in,
-	unsigned int* const d_block_sums,
-	unsigned int* const d_out_2,
-	unsigned int* const d_block_sums_2,
-	unsigned int* const d_dummy_sums,
+void gpu_prescan(unsigned int* d_out,
+	unsigned int*  d_in,
+	unsigned int*  d_block_sums,
+	unsigned int*  d_block_sums_dummy_2,
+	unsigned int*  d_block_sums_2,
+	unsigned int*  d_dummy_sums,
 	const unsigned int len,
 	const unsigned int shmem_sz,
 	const unsigned int max_elems_per_block)
@@ -233,7 +233,7 @@ void gpu_prescan(unsigned int* const d_out,
 	unsigned int* temp2;
 	int thid;
 	cg::grid_group grid = cg::this_grid();
-	id = blockIdx.x * blockDim.x + threadIdx.x; 
+	int id = blockIdx.x * blockDim.x + threadIdx.x; 
 	int ai;
 	int bi;
     for(int a = len; a > 1; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
@@ -335,7 +335,7 @@ void gpu_prescan(unsigned int* const d_out,
 	if(a==len){
 	memcpy(d_block_sums_2[id], d_block_sums[id], sizeof(int)*len);
 	temp = d_out;
-	dout = d_block_sums;
+	d_out = d_block_sums;
 	d_in = d_block_sums_2;
 	d_block_sums = d_dummy_sums;
 	}
