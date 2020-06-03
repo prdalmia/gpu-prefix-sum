@@ -293,8 +293,10 @@ void gpu_prescan(unsigned int* const d_out,
 		s_out[max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)] = 0;
 			//printf("D block sums is %d and a is %d\n", d_block_sums[blockIdx.x], gridDim.x);
-			printf("s[finalout] is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
+			if(gridDim.x == 70){
+							printf("s[finalout] is %d and a is %d\n", d_block_sums[blockIdx.x], max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1));
+			}
 		}
 
 	// Downsweep step
