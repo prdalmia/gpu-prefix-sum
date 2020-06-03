@@ -356,7 +356,6 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums_2[id] = d_block_sums[id];
 	//printf("block sum is  %d and a is %d\n",d_block_sums[id], a);
 	}
-	grid.sync();
 	__syncthreads();
 	__threadfence();
 	if(a == len){
@@ -459,6 +458,10 @@ void sum_scan_blelloch(unsigned int* d_out,
 
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
+	void *kernelArgs[] = {
+        (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums, (void *)&d_block_sums_2,  (void *)&d_block_sums_dummy, (void *)&d_block_sums_dummy_2, (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
+	};
+	cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
 																	d_block_sums,
