@@ -407,7 +407,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 		checkCudaErrors(cudaFree(d_in_block_sums));
 	}
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	int max_elems = grid_sz/max_elems_per_block;
