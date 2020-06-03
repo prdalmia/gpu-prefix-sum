@@ -414,6 +414,7 @@ void sum_scan_blelloch(unsigned int* const d_out,
 	unsigned int* d_block_sums_dummy;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
+	checkCudaErrors(cudaMalloc(&d_block_sums_2, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums_2, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums_dummy, 0, sizeof(unsigned int) * grid_sz));
