@@ -283,6 +283,9 @@ void gpu_prescan(unsigned int* d_out,
 	int offset = 1;
 	for (int d = max_elems_per_block >> 1; d > 0; d >>= 1)
 	{
+		if(a < len && id == 0){
+			printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+		}
 		__syncthreads();
 
 		if (thid < d)
@@ -293,9 +296,11 @@ void gpu_prescan(unsigned int* d_out,
 			bi += CONFLICT_FREE_OFFSET(bi);
 
 			s_out[bi] += s_out[ai];
+			
 		}
 		offset <<= 1;
 	}
+
 
 	// Save the total sum on the global block sums array
 	// Then clear the last element on the shared memory
@@ -305,9 +310,7 @@ void gpu_prescan(unsigned int* d_out,
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)];
 		s_out[max_elems_per_block - 1 
 			+ CONFLICT_FREE_OFFSET(max_elems_per_block - 1)] = 0;
-			if(a < len){
-		printf("D block sums is %d and a is %d\n", d_block_sums[blockIdx.x], a);	
-	}
+			
 	}
 
 	// Downsweep step
