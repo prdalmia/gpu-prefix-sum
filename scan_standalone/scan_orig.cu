@@ -414,7 +414,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	if(grid_sz == 2240){
 	
 	std::cout << "Block sums: ";
-	for (int i = 0; i < max_elems; ++i)
+	for (int i = 0; i < grid_sz; ++i)
 	{
 		std::cout << h_block_sums[i] << std::endl;
 	}
