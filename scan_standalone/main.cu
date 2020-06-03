@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 		for (int i = 0; i < h_in_len; ++i)
 		{
 			//h_in[i] = rand() % 2;
-			h_in[i] = i;
+			h_in[i] = 1;
 		}
 
 		// Set up host-side memory for output
