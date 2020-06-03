@@ -459,7 +459,11 @@ void sum_scan_blelloch(unsigned int* d_out,
 	void *kernelArgs[] = {
         (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums,  (void *)&d_block_sums_dummy,  (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
 	};
-	cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
+	int numBlocksPerSm;
+	cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, gpu_prescan, 512, 0);
+
+	std::cout << "The numBLocks per Sm is " <<  numBlocksPerSm << std::endl;
+		cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
 	cudaDeviceSynchronize();
 	/*
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
