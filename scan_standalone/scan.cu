@@ -462,6 +462,7 @@ void sum_scan_blelloch(unsigned int* d_out,
         (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums, (void *)&d_block_sums_2,  (void *)&d_block_sums_dummy, (void *)&d_block_sums_dummy_2, (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
 	};
 	cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
+	cudaDeviceSynchronize();
 	/*
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
