@@ -219,9 +219,9 @@ __global__
 void gpu_prescan(unsigned int* d_out,
 	unsigned int*  d_in,
 	unsigned int*  d_block_sums,
-	unsigned int*  d_block_sums_dummy_2,
 	unsigned int*  d_block_sums_2,
-	unsigned int*  d_dummy_sums,
+	unsigned int*  d_block_sums_dummy, 
+	unsigned int*  d_block_sums_dummy_2,
 	const unsigned int len,
 	const unsigned int shmem_sz,
 	const unsigned int max_elems_per_block)
@@ -335,7 +335,7 @@ void gpu_prescan(unsigned int* d_out,
 	temp = d_out;
 	d_out = d_block_sums;
 	d_in = d_block_sums_2;
-	d_block_sums = d_dummy_sums;
+	d_block_sums = d_block_sums_dummy;
 	}
 }
 /*
@@ -428,9 +428,9 @@ void sum_scan_blelloch(unsigned int* d_out,
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
 																	d_block_sums,
+																	d_block_sums_2,
+																	d_block_sums_dummy, 
 																	d_block_sums_dummy_2,
-                                                                    d_block_sums_2,
-                                                                    d_block_sums_dummy, 
 																	numElems, 
 																	shmem_sz,
 																	max_elems_per_block);
@@ -444,7 +444,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//// Uncomment to examine block sums
 	int max_elems = grid_sz/max_elems_per_block;
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_dummy_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums_dummy, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	std::cout << "Block sums: ";
 	for (int i = 0; i < max_elems; ++i)
 	{
