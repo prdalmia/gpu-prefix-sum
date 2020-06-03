@@ -349,7 +349,8 @@ void gpu_prescan(unsigned int* d_out,
 		if (cpy_idx + blockDim.x < a)
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
 	}
-    }
+    __syncthreads();
+}
 	grid.sync();
 	//if(a==len && id < gridDim.x){
 	//d_block_sums_2[id] = d_block_sums[id];
