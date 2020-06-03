@@ -360,9 +360,10 @@ void gpu_prescan(unsigned int* d_out,
 	temp3 = d_block_sums_2;
 	d_block_sums = d_block_sums_dummy;
 	}
-
+	
 	__syncthreads();
 	__threadfence();
+	grid.sync();
 	}
 
 	
