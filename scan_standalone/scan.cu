@@ -294,7 +294,7 @@ void gpu_prescan(unsigned int* d_out,
 
 			s_out[bi] += s_out[ai];
 			if(a < len && id == 0){
-				printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+				printf("s[out] is %d and a is %d\n", s_out[ai], a);	
 			}
 		}
 		offset <<= 1;
