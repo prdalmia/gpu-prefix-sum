@@ -358,7 +358,7 @@ void gpu_prescan(unsigned int* d_out,
 	d_in = d_block_sums_2;
 	d_block_sums = d_block_sums_dummy;
 	}
-	
+	__threadfence();
 	__syncthreads();
 	
 	grid.sync();
