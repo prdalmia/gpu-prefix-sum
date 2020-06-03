@@ -1,4 +1,5 @@
 #include "scan.h"
+#include <stdio.h>
 #include <cooperative_groups.h>
 namespace cg = cooperative_groups;
 
