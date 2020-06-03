@@ -263,8 +263,8 @@ void gpu_prescan(unsigned int* const d_out,
 
 		if (thid < d)
 		{
-			if(gridDim.x == 3 && id == 0){
-				printf("s[out] is %d and a is %d\n", s_out[bi], a);	
+			if(gridDim.x == 3 && threadIdx.x == 0){
+				printf("s[out] is %d and a is %d\n", s_out[bi], gridDim.x);	
 			}
 			int ai = offset * ((thid << 1) + 1) - 1;
 			int bi = offset * ((thid << 1) + 2) - 1;
