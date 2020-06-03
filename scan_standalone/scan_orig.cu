@@ -411,10 +411,10 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	int max_elems = grid_sz/max_elems_per_block;
-	if(grid_sz == 2240){
+	if(grid_sz == 35){
 	
 	std::cout << "Block sums: ";
-	for (int i = 0; i < grid_sz; ++i)
+	for (int i = 0; i <2240; ++i)
 	{
 		std::cout << h_block_sums[i] << std::endl;
 	}
@@ -422,7 +422,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	std::cout << "Block sums length: " << grid_sz << std::endl;
 	
 	std::cout << "out sums: ";
-	for (int i = 0; i < grid_sz; ++i)
+	for (int i = 0; i < 2240; ++i)
 	{
 		std::cout << h_block_sums_out[i] << std::endl;
 	}
