@@ -274,6 +274,7 @@ void gpu_prescan(unsigned int* d_out,
 		
 		}
 		}
+	__syncthreads();	
 
 	// For both upsweep and downsweep:
 	// Sequential indices with conflict free padding
@@ -306,6 +307,7 @@ void gpu_prescan(unsigned int* d_out,
 		offset <<= 1;
 	}
 
+	__syncthreads();	
 
 	// Save the total sum on the global block sums array
 	// Then clear the last element on the shared memory
