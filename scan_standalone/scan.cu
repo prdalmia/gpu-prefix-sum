@@ -330,7 +330,7 @@ void gpu_prescan(unsigned int* d_out,
 	}
     }
 	grid.sync();
-	if(a==len && id < gridDim.x)
+	if(a==len && id < gridDim.x){
 	memcpy((void *)d_block_sums_2[id], (const void *)d_block_sums[id], sizeof(int)*len);
 	if(id == 0){
 	temp = d_out;
@@ -339,7 +339,7 @@ void gpu_prescan(unsigned int* d_out,
 	d_block_sums = d_block_sums_dummy;
 	}
 }
-	__syncthreads();
+	_syncthreads();
 }
 	
 }
