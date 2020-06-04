@@ -418,11 +418,8 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * 2240, cudaMemcpyDeviceToHost));
-	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
-
-	
 	if(grid_sz == 35){
-	/*
+	
 	std::cout << "Block sums: ";
 	for (int i = 0; i <2240; ++i)
 	{
@@ -430,7 +427,12 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	}
 	std::cout << std::endl;
 	std::cout << "Block sums length: " << grid_sz << std::endl;
-	*/
+	
+	
+	
+	
+
+	
 	
 	std::cout << "out sums: ";
 	for (int i = 0; i < 2240; ++i)
@@ -445,7 +447,8 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	delete[] h_block_sums_out;
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-	
+	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
+
 	
 	
 	
