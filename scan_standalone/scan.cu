@@ -355,6 +355,7 @@ void gpu_prescan(unsigned int* d_out,
 		printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
 			}
 	}
+}
     __syncthreads();
 }
 	grid.sync();
