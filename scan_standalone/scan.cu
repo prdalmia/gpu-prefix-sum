@@ -489,14 +489,16 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//// Uncomment to examine block sums
 
 	int max_elems = grid_sz/max_elems_per_block;
-	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums_dummy, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+
 	//checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+
+	// Add each block's total sum to its scan output
+	// in order to get the final, global scanned array
+    gpu_add_block_sums<<<max_elems, block_sz>>>(d_block_sums, d_block_sums, d_block_sums_dummy, max_elems);
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	std::cout << "Block sums: ";
-	for (int i = 0; i < max_elems; ++i)
+	for (int i = 0; i < max_elems*2; ++i)
 	{
 		std::cout << h_block_sums[i] << std::endl;
 	}
@@ -504,19 +506,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	std::cout << "Block sums length: " << grid_sz << std::endl;
 	delete[] h_block_sums;
 
-
-std::cout << "out sums: ";
-	for (int i = 0; i < grid_sz; ++i)
-	{
-		std::cout << h_block_sums_out[i] << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << "out sums length: " << grid_sz << std::endl;
-	delete[] h_block_sums_out;
-
-	// Add each block's total sum to its scan output
-	// in order to get the final, global scanned array
-    gpu_add_block_sums<<<grid_sz/max_elems_per_block, block_sz>>>(d_block_sums, d_block_sums, d_block_sums_dummy, max_elems);
+	
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));
