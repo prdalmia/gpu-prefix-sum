@@ -516,7 +516,7 @@ std::cout << "out sums: ";
 
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-
+    gpu_add_block_sums<<<grid_sz, block_sz>>>(d_block_sums, d_block_sums, d_block_sums_dummy, max_elems);
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));
