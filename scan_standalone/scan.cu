@@ -450,7 +450,6 @@ void gpu_prescan(unsigned int* d_out,
 	unsigned int* temp1;
 	unsigned int* temp2;
 	int thid;
-	cg::grid_group grid = cg::this_grid();
 	//int id = blockIdx.x * blockDim.x + threadIdx.x; 
 	int ai;
 	int bi;
@@ -679,9 +678,6 @@ void sum_scan_blelloch(unsigned int* d_out,
     
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
-	void *kernelArgs[] = {
-        (void *)&d_out,  (void *)&d_in, (void *)&d_block_sums,  (void *)&d_block_sums_dummy, (void *)&d_block_sums_dummy_2,  (void *)&numElems, (void *)&shmem_sz, (void *)&max_elems_per_block
-	};
 	int numBlocksPerSm;
 	cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, gpu_prescan, block_sz, 0);
   //Barrier Stuff
