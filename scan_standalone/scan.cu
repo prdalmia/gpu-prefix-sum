@@ -346,8 +346,14 @@ void gpu_prescan(unsigned int* d_out,
 	if (cpy_idx < a)
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
-		if (cpy_idx + blockDim.x < a)
+		if( a == 2240){
+			printf("d[out] is %d and index is %d \n", d_out[cpy_idx], cpy_idx );
+		}
+		if (cpy_idx + blockDim.x < a){
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
+			if( a == 2240){
+		printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
+			}
 	}
     __syncthreads();
 }
@@ -478,7 +484,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//  for the block sums
 	
 	//// Uncomment to examine block sums
-
+/*
 	int max_elems = grid_sz/max_elems_per_block;
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
@@ -503,6 +509,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
+	*/
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));

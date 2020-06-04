@@ -319,8 +319,14 @@ void gpu_prescan(unsigned int* const d_out,
 	if (cpy_idx < len)
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
+		if( gridDim.x == 35){
+			printf("d[out] is %d and index is %d \n", d_out[cpy_idx], cpy_idx );
+		}
 		if (cpy_idx + blockDim.x < len)
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
+			if( gridDim.x == 35){
+				printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
+					}
 	}
 }
 
@@ -406,12 +412,13 @@ void sum_scan_blelloch(unsigned int*  d_out,
 		sum_scan_blelloch(d_block_sums, d_in_block_sums, grid_sz);
 		checkCudaErrors(cudaFree(d_in_block_sums));
 	}
+	/*
 	unsigned int* h_block_sums = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	int max_elems = grid_sz/max_elems_per_block;
-	if(grid_sz == 35){
+		if(grid_sz == 35){
 	
 	std::cout << "Block sums: ";
 	for (int i = 0; i <2240; ++i)
@@ -434,6 +441,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	delete[] h_block_sums_out;
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
+	*/
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	
