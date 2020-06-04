@@ -479,6 +479,9 @@ void sum_scan_blelloch(unsigned int* d_out,
 		float ms;
 		cudaEventElapsedTime(&ms, start, stop);
 		std::cout << "barrier kernel time (ms) " << ms << std::endl;
+
+
+		 
 	/*
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
