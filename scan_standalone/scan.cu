@@ -235,7 +235,7 @@ void gpu_prescan(unsigned int* d_out,
 	//int id = blockIdx.x * blockDim.x + threadIdx.x; 
 	int ai;
 	int bi;
-    for(int a = len; a > 1; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
+    for(int a = len; a > 35; a = ((a+max_elems_per_block-1)/max_elems_per_block)){
 	thid = threadIdx.x;
 	ai = thid;
 	bi = thid + blockDim.x;
@@ -369,12 +369,14 @@ void gpu_prescan(unsigned int* d_out,
 	d_in = d_block_sums;
 	d_block_sums = d_block_sums_dummy;
 	}
+	/*
 	else if ( a<len && a >1){
 	temp2 = d_out;
 	d_out = d_block_sums_dummy;
 	d_in = d_block_sums_dummy;
 	d_block_sums = d_block_sums_dummy_2;
 	}
+	*/
 	__syncthreads();
 }
  
@@ -399,8 +401,8 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 }
 grid.sync();
 */
-d_out = temp2;
-d_block_sums =  d_block_sums_dummy;
+//d_out = temp2;
+//d_block_sums =  d_block_sums_dummy;
 
 }
 
@@ -485,9 +487,11 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//  for the block sums
 	
 	//// Uncomment to examine block sums
-/*
+/
 	int max_elems = grid_sz/max_elems_per_block;
-	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+/*
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
@@ -499,18 +503,20 @@ void sum_scan_blelloch(unsigned int* d_out,
 	std::cout << std::endl;
 	std::cout << "Block sums length: " << grid_sz << std::endl;
 	delete[] h_block_sums;
-	std::cout << "out sums: ";
+*/
+
+std::cout << "out sums: ";
 	for (int i = 0; i < grid_sz; ++i)
 	{
 		std::cout << h_block_sums_out[i] << std::endl;
 	}
 	std::cout << std::endl;
 	std::cout << "out sums length: " << grid_sz << std::endl;
-	delete[] h_block_sums;
+	delete[] h_block_sums_out;
 
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
-	*/
+
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
 	//checkCudaErrors(cudaFree(d_block_sums));
