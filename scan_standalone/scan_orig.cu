@@ -413,25 +413,11 @@ void sum_scan_blelloch(unsigned int*  d_out,
 		sum_scan_blelloch(d_block_sums, d_in_block_sums, grid_sz);
 		checkCudaErrors(cudaFree(d_in_block_sums));
 	}
-	int max_elems = grid_sz/max_elems_per_block;
-	unsigned int* h_block_sums = new unsigned int[grid_sz];
 	
 	// Add each block's total sum to its scan output
 	// in order to get the final, global scanned array
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
-
-    checkCudaErrors(cudaMemcpy(h_block_sums, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-	if(grid_sz == 35){
-	std::cout << "Block sums: ";
-	for (int i = 0; i < grid_sz; ++i)
-	{
-		std::cout << h_block_sums[i] << std::endl;
-	}
-	std::cout << std::endl;
-	std::cout << "Block sums length: " << grid_sz << std::endl;
 }
-	delete[] h_block_sums;
-	
-	
+		
 	checkCudaErrors(cudaFree(d_block_sums));
 }
