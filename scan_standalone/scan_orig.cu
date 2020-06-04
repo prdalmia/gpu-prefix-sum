@@ -320,12 +320,12 @@ void gpu_prescan(unsigned int* const d_out,
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
 		if( gridDim.x == 35){
-			//printf("d[out] is %d and index is %d \n", d_out[cpy_idx], cpy_idx );
+			printf("d[out] is %d and index is %d \n", d_out[cpy_idx], cpy_idx );
 		}
 		if (cpy_idx + blockDim.x < len){
 					d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
 			if( gridDim.x == 35){
-				//printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
+				printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
 					}
 				}
 	}

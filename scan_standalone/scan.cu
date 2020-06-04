@@ -346,13 +346,13 @@ void gpu_prescan(unsigned int* d_out,
 	if (cpy_idx < a)
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
-		if( a == 2240){
-			//printf("d[out] is %d and index is %d \n", d_out[cpy_idx], cpy_idx );
+		if( a < len){
+			printf("d[out] is %d and index is %d nad a is \n", d_out[cpy_idx], cpy_idx, a );
 		}
 		if (cpy_idx + blockDim.x < a){
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
-			if( a == 2240){
-		//printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x);
+			if( a < len){
+		printf("d[out] is %d and index is %d \n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x, a);
 			}
 	}
 }
