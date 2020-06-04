@@ -418,6 +418,7 @@ void sum_scan_blelloch(unsigned int*  d_out,
 	// in order to get the final, global scanned array
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 }
-		
+	
+	
 	checkCudaErrors(cudaFree(d_block_sums));
 }
