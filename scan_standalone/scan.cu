@@ -669,8 +669,6 @@ void sum_scan_blelloch(unsigned int* d_out,
 	unsigned int* d_block_sums_dummy;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMalloc(&d_block_sums_2, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMemset(d_block_sums_2, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums_dummy, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy_2, sizeof(unsigned int) * grid_sz));
@@ -707,7 +705,12 @@ void sum_scan_blelloch(unsigned int* d_out,
      }
 	std::cout << "The numBLocks per Sm is " <<  numBlocksPerSm << std::endl;
 		//cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
+		cudaEvent_t start;
+		cudaEvent_t stop;
+		cudaEventCreate(&start);
+		cudaEventCreate(&stop);
 	
+		cudaEventRecord(start);
 	gpu_prescan<<<grid_sz, block_sz, sizeof(unsigned int) * shmem_sz>>>(d_out, 
 																	d_in, 
 																	d_block_sums,
@@ -725,7 +728,11 @@ void sum_scan_blelloch(unsigned int* d_out,
 																	NUM_SM
 																);
 
-     cudaDeviceSynchronize();
+																cudaEventRecord(stop);
+																cudaDeviceSynchronize();
+																float ms;
+																cudaEventElapsedTime(&ms, start, stop);
+																std::cout << "barrier kernel time (ms) " << ms << std::endl;
 	// Sum scan total sums produced by each block
 	// Use basic implementation if number of total sums is <= 2 * block_sz
 	//  (This requires only one block to do the scan)
