@@ -347,12 +347,12 @@ void gpu_prescan(unsigned int* d_out,
 	{
 		d_out[cpy_idx] = s_out[ai + CONFLICT_FREE_OFFSET(ai)];
 		if( a < len){
-			printf("d[out] is %d and index is %d and a is %d \n", d_out[cpy_idx], cpy_idx, a );
+			//printf("d[out] is %d and index is %d and a is %d \n", d_out[cpy_idx], cpy_idx, a );
 		}
 		if (cpy_idx + blockDim.x < a){
 			d_out[cpy_idx + blockDim.x] = s_out[bi + CONFLICT_FREE_OFFSET(bi)];
 			if( a < len){
-		printf("d[out] is %d and index is %d nad a is %d\n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x, a);
+		//printf("d[out] is %d and index is %d nad a is %d\n", d_out[cpy_idx + blockDim.x], cpy_idx + blockDim.x, a);
 			}
 	}
 }
@@ -381,7 +381,7 @@ void gpu_prescan(unsigned int* d_out,
 }
  
  
-
+/*
 //unsigned int glbl_t_idx = blockDim.x * blockIdx.x + threadIdx.x;
 if(blockIdx.x < ((len+max_elems_per_block-1)/max_elems_per_block)){
 unsigned int d_block_sum_val = d_block_sums_dummy[blockIdx.x];
@@ -400,9 +400,9 @@ if (cpy_idx < ((len+max_elems_per_block-1)/max_elems_per_block))
 }
 }
 grid.sync();
-
-d_out = temp1;
-d_block_sums =  temp2;
+*/
+//d_out = temp1;
+//d_block_sums =  temp2;
 
 }
 
@@ -491,10 +491,10 @@ void sum_scan_blelloch(unsigned int* d_out,
 	int max_elems = grid_sz/max_elems_per_block;
 	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
 	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-/*
-	unsigned int* h_block_sums_out = new unsigned int[grid_sz];
-	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+
+	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	checkCudaErrors(cudaMemcpy(h_block_sums, d_block_sums_dummy, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
+	//checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 	std::cout << "Block sums: ";
 	for (int i = 0; i < grid_sz; ++i)
 	{
@@ -503,7 +503,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	std::cout << std::endl;
 	std::cout << "Block sums length: " << grid_sz << std::endl;
 	delete[] h_block_sums;
-*/
+
 
 std::cout << "out sums: ";
 	for (int i = 0; i < grid_sz; ++i)
