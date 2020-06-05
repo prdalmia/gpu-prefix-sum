@@ -686,7 +686,7 @@ void sum_scan_blelloch(unsigned int* d_out,
     bool * global_sense;
     bool* perSMsense;
     bool * done;
-    int NUM_SM = 80;
+    int NUM_SM = 20;
     cudaMallocManaged((void **)&global_sense,sizeof(bool));
     cudaMallocManaged((void **)&done,sizeof(bool));
     cudaMallocManaged((void **)&perSMsense,NUM_SM*sizeof(bool));
