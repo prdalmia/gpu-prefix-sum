@@ -724,7 +724,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 		cudaDeviceSynchronize();
 	
 
-	double ms;
+	float ms;
 	cudaEventElapsedTime(&ms, start, stop);
     
     
