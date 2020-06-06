@@ -653,7 +653,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//unsigned int grid_sz = (unsigned int) std::ceil((double) numElems / (double) max_elems_per_block);
 	// UPDATE: Instead of using ceiling and risking miscalculation due to precision, just automatically  
 	//  add 1 to the grid size when the input size cannot be divided cleanly by the block's capacity
-	unsigned int grid_sz = numElems / max_elems_per_block;
+	unsigned int grid_sz = (numElems + max_elems_per_block -1) / max_elems_per_block;
 	// Take advantage of the fact that integer division drops the decimals
 	//if (numElems % max_elems_per_block != 0) 
 		//grid_sz += 1;
@@ -676,8 +676,6 @@ void sum_scan_blelloch(unsigned int* d_out,
     
 	// Sum scan data allocated to each block
 	//gpu_sum_scan_blelloch<<<grid_sz, block_sz, sizeof(unsigned int) * max_elems_per_block >>>(d_out, d_in, d_block_sums, numElems);
-	int numBlocksPerSm;
-	cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, gpu_prescan, block_sz, 0);
   //Barrier Stuff
 	
     unsigned int* global_count;
@@ -703,7 +701,6 @@ void sum_scan_blelloch(unsigned int* d_out,
        cudaMemset(&local_count[i], 0, sizeof(unsigned int));
        cudaMemset(&last_block[i], 0, sizeof(unsigned int));
      }
-	std::cout << "The numBLocks per Sm is " <<  numBlocksPerSm << std::endl;
 		//cudaLaunchCooperativeKernel((void*)gpu_prescan, grid_sz, block_sz,  kernelArgs, sizeof(unsigned int) * shmem_sz, 0);
 		cudaEvent_t start;
 		cudaEvent_t stop;
@@ -728,11 +725,11 @@ void sum_scan_blelloch(unsigned int* d_out,
 																	NUM_SM
 																);
 
-																cudaEventRecord(stop);
-																cudaDeviceSynchronize();
-																float ms;
-																cudaEventElapsedTime(&ms, start, stop);
-																std::cout << "barrier kernel time (ms) " << ms << std::endl;
+	cudaEventRecord(stop);
+    cudaDeviceSynchronize();
+    float ms;
+    cudaEventElapsedTime(&ms, start, stop);
+    std::cout << "barrier kernel time (ms) " << ms << std::endl;
 	// Sum scan total sums produced by each block
 	// Use basic implementation if number of total sums is <= 2 * block_sz
 	//  (This requires only one block to do the scan)
@@ -741,8 +738,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	
 	//// Uncomment to examine block sums
 
-	int max_elems = grid_sz/max_elems_per_block;
-	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	int max_elems = (grid_sz + max_elems_per_block -1)/max_elems_per_block;
 
 	//checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 
@@ -751,6 +747,7 @@ void sum_scan_blelloch(unsigned int* d_out,
     gpu_add_block_sums<<<max_elems, block_sz>>>(d_block_sums, d_block_sums, d_block_sums_dummy, grid_sz);
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
-	checkCudaErrors(cudaFree(d_block_sums));
-
+	 checkCudaErrors(cudaFree(d_block_sums));
+	 checkCudaErrors(cudaFree(d_block_sums_dummy));
+	 checkCudaErrors(cudaFree(d_block_sums_dummy_2));
 }
