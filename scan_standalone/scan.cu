@@ -56,14 +56,14 @@ __threadfence();
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
 // (capped) exponential backoff
-backoff = (((backoff << 1) + 1) & (1024-1));
+backoff = (((backoff << 1) + 1) & (64-1));
 }
 }
 __syncthreads();
 
 // do exponential backoff to reduce the number of times we pound the global
 // barrier
-if (*global_sense != *sense) {
+if (isMasterThread) {
 for (int i = 0; i < backoff; ++i) { ; }
 __syncthreads();
 }
@@ -169,9 +169,6 @@ cudaBarrierAtomicLocalSRB(&local_count[smID], &last_block[smID], smID, numTBs_pe
 // only 1 TB per SM needs to do the global barrier since we synchronized
 // the TBs locally first
 if (blockIdx.x == last_block[smID]) {
-    if(isMasterThread && perSM_blockID == 0){    
-    }
-    __syncthreads();
 cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread , &perSMsense[smID], global_sense);  
 //*done = 1;
 }
@@ -665,7 +662,6 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// Array length must be the same as number of blocks
 	unsigned int* d_block_sums;
 	unsigned int* d_block_sums_dummy_2;
-	unsigned int* d_block_sums_2;
 	unsigned int* d_block_sums_dummy;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
