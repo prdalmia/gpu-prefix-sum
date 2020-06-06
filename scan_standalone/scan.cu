@@ -63,10 +63,10 @@ __syncthreads();
 
 // do exponential backoff to reduce the number of times we pound the global
 // barrier
-if (*global_sense != *sense) {
+if (isMasterThread) {
 for (int i = 0; i < backoff; ++i) { ; }
-__syncthreads();
 }
+__syncthreads();
 }
 }
 
