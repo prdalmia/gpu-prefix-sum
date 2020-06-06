@@ -720,11 +720,11 @@ void sum_scan_blelloch(unsigned int* d_out,
 																	last_block, 
 																	NUM_SM
 																);
-
+	cudaDeviceSynchronize();
 	cudaEventRecord(stop);
 	float ms;
 	cudaEventElapsedTime(&ms, start, stop);
-    cudaDeviceSynchronize();
+    
     
    
     std::cout << "barrier kernel time (ms) " << ms << std::endl;
