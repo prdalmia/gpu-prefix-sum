@@ -655,8 +655,8 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//  add 1 to the grid size when the input size cannot be divided cleanly by the block's capacity
 	unsigned int grid_sz = numElems / max_elems_per_block;
 	// Take advantage of the fact that integer division drops the decimals
-	if (numElems % max_elems_per_block != 0) 
-		grid_sz += 1;
+	//if (numElems % max_elems_per_block != 0) 
+		//grid_sz += 1;
 
 	// Conflict free padding requires that shared memory be more than 2 * block_sz
 	unsigned int shmem_sz = max_elems_per_block + ((max_elems_per_block - 1) >> LOG_NUM_BANKS);
@@ -686,7 +686,7 @@ void sum_scan_blelloch(unsigned int* d_out,
     bool * global_sense;
     bool* perSMsense;
     bool * done;
-    int NUM_SM = 20;
+    int NUM_SM = 68;
     cudaMallocManaged((void **)&global_sense,sizeof(bool));
     cudaMallocManaged((void **)&done,sizeof(bool));
     cudaMallocManaged((void **)&perSMsense,NUM_SM*sizeof(bool));
