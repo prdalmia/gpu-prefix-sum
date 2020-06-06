@@ -435,7 +435,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	//unsigned int grid_sz = (unsigned int) std::ceil((double) numElems / (double) max_elems_per_block);
 	// UPDATE: Instead of using ceiling and risking miscalculation due to precision, just automatically  
 	//  add 1 to the grid size when the input size cannot be divided cleanly by the block's capacity
-	unsigned int grid_sz = numElems / max_elems_per_block;
+	unsigned int grid_sz = (numElems + max_elems_per_block -1) / max_elems_per_block;
 	// Take advantage of the fact that integer division drops the decimals
 	if (numElems % max_elems_per_block != 0) 
 		grid_sz += 1;
@@ -447,12 +447,9 @@ void sum_scan_blelloch(unsigned int* d_out,
 	// Array length must be the same as number of blocks
 	unsigned int* d_block_sums;
 	unsigned int* d_block_sums_dummy_2;
-	unsigned int* d_block_sums_2;
 	unsigned int* d_block_sums_dummy;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMalloc(&d_block_sums_2, sizeof(unsigned int) * grid_sz));
-	checkCudaErrors(cudaMemset(d_block_sums_2, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums_dummy, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy_2, sizeof(unsigned int) * grid_sz));
@@ -501,8 +498,7 @@ void sum_scan_blelloch(unsigned int* d_out,
 	
 	//// Uncomment to examine block sums
 
-	int max_elems = grid_sz/max_elems_per_block;
-	unsigned int* h_block_sums = new unsigned int[grid_sz];
+	int max_elems = (grid_sz + max_elems_per_block -1)/max_elems_per_block;
 
 	//checkCudaErrors(cudaMemcpy(h_block_sums_out, d_out, sizeof(unsigned int) * grid_sz, cudaMemcpyDeviceToHost));
 
@@ -511,6 +507,8 @@ void sum_scan_blelloch(unsigned int* d_out,
     gpu_add_block_sums<<<max_elems, block_sz>>>(d_block_sums, d_block_sums, d_block_sums_dummy, grid_sz);
 	gpu_add_block_sums<<<grid_sz, block_sz>>>(d_out, d_out, d_block_sums, numElems);
 
-	checkCudaErrors(cudaFree(d_block_sums));
+	 checkCudaErrors(cudaFree(d_block_sums));
+	 checkCudaErrors(cudaFree(d_block_sums_dummy));
+	 checkCudaErrors(cudaFree(d_block_sums_dummy_2));
 	
 }
