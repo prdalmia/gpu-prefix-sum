@@ -57,7 +57,7 @@ __threadfence();
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
 // (capped) exponential backoff
-backoff = (((backoff << 1) + 1) & (64-1));
+backoff = (((backoff << 1) + 1) & (4096-1));
 }
 }
 __syncthreads();
