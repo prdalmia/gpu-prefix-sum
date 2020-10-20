@@ -24,6 +24,15 @@ __device__ __forceinline__ bool ld_gbl_cg (const bool *addr)
     return (bool)t;
 }
 
+__device__ __forceinline__ void st_gbl_cg (const bool *addr, bool t)
+{
+#if defined(__LP64__) || defined(_WIN64)
+    asm ("st.global.cg.u8 [%0], %1;" : "=l"(addr) : "h"((short)t));
+#else
+    asm ("st.global.cg.u8 [%0], %1;" : "=r"(addr) : "h"((short)t));
+#endif
+}
+
 inline __device__ void cudaBarrierAtomicSubSRB(unsigned int * globalBarr,
     // numBarr represents the number of
     // TBs going to the barrier
@@ -137,7 +146,7 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 // locally
 __threadfence();
-atomicExch((int*)sense, (int) s);
+st_gbl_cg(sense, s);
 __threadfence();
 *last_block = blockIdx.x;
 }
