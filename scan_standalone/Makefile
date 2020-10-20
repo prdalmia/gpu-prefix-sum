@@ -5,7 +5,7 @@ scan: main.cu scan.o Makefile
 	nvcc -o scan main.cu scan.o $(NVCC_OPTS)
 
 scan_ccg: main.cu scan_with_ccg.o Makefile
-	nvcc -o scan main.cu scan_with_ccg.o $(NVCC_OPTS)	
+	nvcc -o scan_ccg main.cu scan_with_ccg.o $(NVCC_OPTS)	
 
 scan.o: scan.cu
 	nvcc -c scan.cu $(NVCC_OPTS)
