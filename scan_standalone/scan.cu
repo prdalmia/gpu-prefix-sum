@@ -126,7 +126,7 @@ barrier.
 if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 // locally
-__threadfence_block();
+__threadfence();
 *sense = s;
 *last_block = blockIdx.x;
 }
