@@ -137,7 +137,7 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 // locally
 __threadfence();
-*sense = s;
+atomicExch((int*)sense, (int) s);
 __threadfence();
 *last_block = blockIdx.x;
 }
