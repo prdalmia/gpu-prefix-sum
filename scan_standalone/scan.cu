@@ -138,6 +138,7 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 // locally
 __threadfence();
 *sense = s;
+__threadfence();
 *last_block = blockIdx.x;
 }
 }
