@@ -131,7 +131,7 @@ atomicInc(perSMBarr, 0x7FFFFFFF);
 }
 __syncthreads();
 
-while (*sense != s)
+while (ld_gbl_cg(sense) != s)
 {
 if (isMasterThread)
 {
@@ -146,8 +146,7 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 // locally
 __threadfence();
-st_gbl_cg(sense, s);
-__threadfence();
+*sense = s;
 *last_block = blockIdx.x;
 }
 }
