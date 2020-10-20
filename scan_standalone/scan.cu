@@ -70,7 +70,8 @@ proceed because all of the TBs have reached the global barrier.
 if (atomicCAS(globalBarr, numBarr, 0) == numBarr) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 __threadfence();
-atomicExch((int*)global_sense, (int) sense);
+*global_sense = *sense;
+__threadfence();
  printf("Setting global sense = sense \n");
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
