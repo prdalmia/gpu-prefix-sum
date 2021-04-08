@@ -150,8 +150,8 @@ cudaBarrierAtomicSubLocalSRB(perSMBarrierBuffers, numTBs_thisSM, isMasterThread,
 /*
 Helper function for joining the barrier with the atomic tree barrier.
 */
-__device__ void joinBarrier_helperSRB(bool * global_sense,
-bool * perSMsense,
+__device__ void joinBarrier_helperSRB(bool * volatile global_sense,
+bool * volatile perSMsense,
 bool * done,
 unsigned int* global_count,
 unsigned int* local_count,
@@ -192,8 +192,8 @@ cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread,  &perSMsense
 }
 
 
-__device__ void kernelAtomicTreeBarrierUniqSRB( bool * global_sense,
-bool * perSMsense,
+__device__ void kernelAtomicTreeBarrierUniqSRB( bool * volatile global_sense,
+bool * volatile perSMsense,
 bool * done,
 unsigned int* global_count,
 unsigned int* local_count,
@@ -437,8 +437,8 @@ void gpu_prescan(unsigned int* d_out,
 	const unsigned int len,
 	const unsigned int shmem_sz,
 	const unsigned int max_elems_per_block,
-	bool * global_sense,
-    bool * perSMsense,
+	bool * volatile global_sense,
+    bool * volatile perSMsense,
     bool * done,
     unsigned int* global_count,
     unsigned int* local_count,
@@ -672,8 +672,8 @@ void sum_scan_blelloch(unsigned int* d_out,
     unsigned int* global_count;
     unsigned int* local_count; 
     unsigned int *last_block;
-    bool * global_sense;
-    bool* perSMsense;
+    bool * volatile global_sense;
+    bool* volatile perSMsense;
     bool * done;
     cudaDeviceProp deviceProp;
     cudaGetDeviceProperties(&deviceProp, 0);
