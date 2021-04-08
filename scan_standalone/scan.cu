@@ -474,17 +474,9 @@ void gpu_prescan(unsigned int* d_out,
 	if (cpy_idx < a)
 	{
 		s_out[ai + CONFLICT_FREE_OFFSET(ai)] = d_in[cpy_idx];
-	
-		if( a == 2560){
-		//printf("s[out] ai is %d and a is %d\n", d_in[cpy_idx], a);
-		}
 		
 		if (cpy_idx + blockDim.x < a){
 			s_out[bi + CONFLICT_FREE_OFFSET(bi)] = d_in[cpy_idx + blockDim.x];
-		
-		if( a == 2560){
-		//printf("s[out] bi is %d and a is %d\n", d_in[cpy_idx + blockDim.x], a);
-		}
 		
 		}
 		}
@@ -680,7 +672,9 @@ void sum_scan_blelloch(unsigned int* d_out,
     bool * global_sense;
     bool* perSMsense;
     bool * done;
-    int NUM_SM = 68;
+    cudaDeviceProp deviceProp;
+    cudaGetDeviceProperties(&deviceProp, 0);
+    int NUM_SM = deviceProp.multiProcessorCount;
     cudaMallocManaged((void **)&global_sense,sizeof(bool));
     cudaMallocManaged((void **)&done,sizeof(bool));
     cudaMallocManaged((void **)&perSMsense,NUM_SM*sizeof(bool));
