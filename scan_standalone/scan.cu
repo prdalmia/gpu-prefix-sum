@@ -161,7 +161,7 @@ const int smID,
 const int perSM_blockID,
 const int numTBs_perSM,
 const bool isMasterThread) {                                 
-//*done = 0;
+*done = 0;
 	__syncthreads();
 if (numTBs_perSM > 1) {
 cudaBarrierAtomicLocalSRB(&local_count[smID], &last_block[smID], smID, numTBs_perSM, isMasterThread, &perSMsense[smID]);
@@ -170,14 +170,14 @@ cudaBarrierAtomicLocalSRB(&local_count[smID], &last_block[smID], smID, numTBs_pe
 // the TBs locally first
 if (blockIdx.x == last_block[smID]) {
 cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread , &perSMsense[smID], global_sense);  
-//*done = 1;
-//__syncthreads();
+*done = 1;
+__syncthreads();
 }
 else {
 if(isMasterThread){
 
-//while (*done != 1){__threadfence();}	
-while (global_sense != perSMsense[smID]){  
+while (*done != 1){__threadfence();}	
+while (*global_sense != perSMsense[smID]){  
 __threadfence();
 }
 }
