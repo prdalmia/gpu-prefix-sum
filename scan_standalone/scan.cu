@@ -23,6 +23,53 @@ __device__ __forceinline__ bool ld_gbl_cg (const bool *addr)
     return (bool)t;
 }
 
+inline __device__ void cudaBarrierAtomicNaiveSRB(unsigned int *globalBarr,
+	// numBarr represents the number
+	// of TBs going to the barrier
+	const unsigned int numBarr,
+	int backoff,
+	const bool isMasterThread,
+	bool * volatile global_sense) {
+  __syncthreads();
+  __shared__ bool s;
+  if (isMasterThread) {
+  s = !(ld_gbl_cg(global_sense));
+  __threadfence();
+  // atomicInc effectively adds 1 to atomic for each TB that's part of the
+  // global barrier.
+  atomicInc(globalBarr, 0x7FFFFFFF);
+   //printf("Global barr is %d and numbarr is %d\n", *globalBarr, numBarr);
+  }
+  __syncthreads();
+  
+  while (ld_gbl_cg(global_sense) != s) {
+  if (isMasterThread) {
+  /*
+  Once the atomic's value == numBarr, then reset the value to 0 and
+  proceed because all of the TBs have reached the global barrier.
+  */
+  if (atomicCAS(globalBarr, numBarr, 0) == numBarr) {
+  // atomicCAS acts as a load acquire, need TF to enforce ordering
+  __threadfence();
+  *global_sense = s;
+  } else { // increase backoff to avoid repeatedly hammering global barrier
+  // (capped) exponential backoff
+  backoff = (((backoff << 1) + 1) & (1024 - 1));
+  }
+  }
+  __syncthreads();
+  
+  // do exponential backoff to reduce the number of times we pound the global
+  // barrier
+  if (ld_gbl_cg(global_sense) != s) {
+  for (int i = 0; i < backoff; ++i) {
+  ;
+  }
+  __syncthreads();
+  }
+  }
+  }
+  
 inline __device__ void cudaBarrierAtomicSubSRB(unsigned int * globalBarr,
     // numBarr represents the number of
     // TBs going to the barrier
@@ -61,10 +108,6 @@ if (atomicCAS(globalBarr, numBarr, 0) == numBarr) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 __threadfence();
 *global_sense = ld_gbl_cg(sense);
-//atomExch()
-//__threadfence();
- //printf("Setting global sense = sense \n");
- 
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
 // (capped) exponential backoff
@@ -173,23 +216,21 @@ const unsigned int numBlocksAtBarr,
 const int smID,
 const int perSM_blockID,
 const int numTBs_perSM,
-const bool isMasterThread) {                                 
+const bool isMasterThread,
+bool naive) {                                 
 //*done = 0;
 	__syncthreads();
-if (numTBs_perSM > 1) {
+if (numTBs_perSM > 1 && naive == false) {
 cudaBarrierAtomicLocalSRB(&local_count[smID], &last_block[smID], smID, numTBs_perSM, isMasterThread, &perSMsense[smID]);
 
 // only 1 TB per SM needs to do the global barrier since we synchronized
 // the TBs locally first
 if (blockIdx.x == last_block[smID]) {
 cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread , &perSMsense[smID], global_sense);  
-//*done = 1;
-//__syncthreads();
+
 }
 else {
 if(isMasterThread){
-	//__threadfence();
-//while (*done != 1){__threadfence();}	
 while (*global_sense != ld_gbl_cg(&perSMsense[smID])){  
 __threadfence();
 }
@@ -197,10 +238,12 @@ __threadfence();
 __syncthreads();
 }    
 } else { // if only 1 TB on the SM, no need for the local barriers
-    if(isMasterThread){
-    perSMsense[smID] = ~perSMsense[smID];
+    __shared__ int backoff;
+    if (isMasterThread) {
+      backoff = 1;
     }
-cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread,  &perSMsense[smID], global_sense);
+    __syncthreads();
+  cudaBarrierAtomicNaiveSRB(global_count, (numBlocksAtBarr*numTBs_perSM), backoff,  isMasterThread,  global_sense);
 }
 }
 
@@ -211,7 +254,8 @@ bool * done,
 unsigned int* global_count,
 unsigned int* local_count,
 unsigned int* last_block,
-const int NUM_SM)
+const int NUM_SM,
+bool naive)
 {
 
 // local variables
@@ -234,7 +278,7 @@ int numTBs_perSM = (int)ceil((float)gridDim.x / numBlocksAtBarr);
 
 joinBarrier_helperSRB(global_sense, perSMsense, done, global_count, local_count, last_block,
 numBlocksAtBarr, smID, perSM_blockID, numTBs_perSM,
-isMasterThread);
+isMasterThread, naive);
 
 }
 
@@ -456,7 +500,8 @@ void gpu_prescan(unsigned int* d_out,
     unsigned int* global_count,
     unsigned int* local_count,
     unsigned int* last_block,
-    const int NUM_SM)
+    const int NUM_SM,
+    bool naive)
 {
 	// Allocated on invocation
 	extern __shared__ unsigned int s_out[];
@@ -581,7 +626,7 @@ void gpu_prescan(unsigned int* d_out,
 }
     __syncthreads();
 }
-     kernelAtomicTreeBarrierUniqSRB(global_sense, perSMsense, done, global_count, local_count, last_block, NUM_SM);
+     kernelAtomicTreeBarrierUniqSRB(global_sense, perSMsense, done, global_count, local_count, last_block, NUM_SM, naive);
 	//if(a==len && id < gridDim.x){
 	//d_block_sums_2[id] = d_block_sums[id];
 	//printf("block sum is  %d and a is %d\n",d_block_sums[id], a);
@@ -688,6 +733,7 @@ void sum_scan_blelloch(unsigned int* d_out,
     bool * volatile global_sense;
     bool* volatile perSMsense;
     bool * done;
+	bool naive = true;
     cudaDeviceProp deviceProp;
     cudaGetDeviceProperties(&deviceProp, 0);
     int NUM_SM = deviceProp.multiProcessorCount;
@@ -728,7 +774,8 @@ void sum_scan_blelloch(unsigned int* d_out,
 																	global_count, 
 																	local_count, 
 																	last_block, 
-																	NUM_SM
+																	NUM_SM,
+																	naive
 																);
 
 	cudaEventRecord(stop);
