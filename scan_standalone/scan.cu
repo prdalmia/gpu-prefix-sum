@@ -239,12 +239,6 @@ int numTBs_perSM = (int)ceil((float)gridDim.x / numBlocksAtBarr);
 joinBarrier_helperSRB(global_sense, perSMsense, done, global_count, local_count, last_block,
 numBlocksAtBarr, smID, perSM_blockID, numTBs_perSM,
 isMasterThread);
-if(isMasterThread){
-if(blockIdx.x/68 == 0){
-	printf("Exiting for smID %d\n", smID);
-		}
-	}
-	__syncthreads();
 
 }
 
