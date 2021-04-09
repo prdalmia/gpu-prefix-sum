@@ -12,6 +12,16 @@
 #else
 #define CONFLICT_FREE_OFFSET(n) ((n) >> LOG_NUM_BANKS)
 #endif
+__device__ __forceinline__ bool ld_gbl_cg (const bool *addr)
+{
+    short t;
+#if defined(__LP64__) || defined(_WIN64)
+    asm ("ld.global.cg.u8 %0, [%1];" : "=h"(t) : "l"(addr));
+#else
+    asm ("ld.global.cg.u8 %0, [%1];" : "=h"(t) : "r"(addr));
+#endif
+    return (bool)t;
+}
 
 inline __device__ void cudaBarrierAtomicSubSRB(unsigned int * globalBarr,
     // numBarr represents the number of
@@ -35,7 +45,7 @@ printf("Global barr is %d and numBarr is %d\n", *globalBarr, numBarr);
 }
 __syncthreads();
 
-while (*global_sense != *sense)
+while (*global_sense != ld_gbl_cg(sense))
 {
 if (isMasterThread)
 {
@@ -50,7 +60,7 @@ proceed because all of the TBs have reached the global barrier.
 if (atomicCAS(globalBarr, numBarr, 0) == numBarr) {
 // atomicCAS acts as a load acquire, need TF to enforce ordering
 __threadfence();
-*global_sense = *sense;
+*global_sense = ld_gbl_cg(sense);
 //atomExch()
 __threadfence();
  printf("Setting global sense = sense \n");
@@ -105,7 +115,7 @@ if (isMasterThread)
 	if(blockIdx.x/68 == 0){
 printf("Local barrier starting for smID %d\n", smID);
 	}
-s = !(*sense);
+s = !(ld_gbl_cg(sense));
 // atomicInc acts as a store release, need TF to enforce ordering locally
 __threadfence_block();
 /*
@@ -117,7 +127,7 @@ atomicInc(perSMBarr, 0x7FFFFFFF);
 }
 __syncthreads();
 
-while (*sense != s)
+while (ld_gbl_cg(sense) != s)
 {
 if (isMasterThread)
 {
@@ -184,7 +194,7 @@ else {
 if(isMasterThread){
 	__threadfence();
 //while (*done != 1){__threadfence();}	
-while (*global_sense != perSMsense[smID]){  
+while (*global_sense != ld_gbl_cg(perSMsense[smID])){  
 __threadfence();
 }
 }
