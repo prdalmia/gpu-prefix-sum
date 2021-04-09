@@ -188,7 +188,7 @@ cudaBarrierAtomicSRB(global_count, numBlocksAtBarr, isMasterThread , &perSMsense
 }
 else {
 if(isMasterThread){
-	__threadfence();
+	//__threadfence();
 //while (*done != 1){__threadfence();}	
 while (*global_sense != ld_gbl_cg(&perSMsense[smID])){  
 __threadfence();
