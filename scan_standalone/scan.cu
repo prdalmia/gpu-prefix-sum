@@ -31,7 +31,7 @@ __threadfence();
 // atomicInc effectively adds 1 to atomic for each TB that's part of the
 // global barrier.
 atomicInc(globalBarr, 0x7FFFFFFF);
-//printf("Global barr is %d\n", *globalBarr);
+printf("Global barr is %d and numBarr is %d\n", *globalBarr, numBarr);
 }
 __syncthreads();
 
@@ -54,6 +54,7 @@ __threadfence();
 //atomExch()
 __threadfence();
  printf("Setting global sense = sense \n");
+ 
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
 // (capped) exponential backoff
