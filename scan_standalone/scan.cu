@@ -62,7 +62,7 @@ if (atomicCAS(globalBarr, numBarr, 0) == numBarr) {
 __threadfence();
 *global_sense = ld_gbl_cg(sense);
 //atomExch()
-__threadfence();
+//__threadfence();
  //printf("Setting global sense = sense \n");
  
 }
