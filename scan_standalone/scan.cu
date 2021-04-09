@@ -230,6 +230,10 @@ joinBarrier_helperSRB(global_sense, perSMsense, done, global_count, local_count,
 numBlocksAtBarr, smID, perSM_blockID, numTBs_perSM,
 isMasterThread);
 
+if(blockIdx.x/68 == 0){
+	printf("Exiting for smID %d\n", smID);
+		}
+
 }
 
 
