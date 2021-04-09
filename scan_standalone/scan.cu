@@ -194,7 +194,7 @@ else {
 if(isMasterThread){
 	__threadfence();
 //while (*done != 1){__threadfence();}	
-while (*global_sense != ld_gbl_cg(perSMsense[smID])){  
+while (*global_sense != ld_gbl_cg(&perSMsense[smID])){  
 __threadfence();
 }
 }
