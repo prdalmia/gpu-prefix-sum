@@ -63,7 +63,7 @@ __threadfence();
 *global_sense = ld_gbl_cg(sense);
 //atomExch()
 __threadfence();
- printf("Setting global sense = sense \n");
+ //printf("Setting global sense = sense \n");
  
 }
 else { // increase backoff to avoid repeatedly hammering global barrier
