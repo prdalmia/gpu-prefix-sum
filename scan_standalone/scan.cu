@@ -112,9 +112,6 @@ __syncthreads();
 __shared__ bool s;
 if (isMasterThread)
 {
-	if(blockIdx.x/68 == 0){
-printf("Local barrier starting for smID %d\n", smID);
-	}
 s = !(ld_gbl_cg(sense));
 // atomicInc acts as a store release, need TF to enforce ordering locally
 __threadfence_block();
@@ -144,7 +141,6 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 __threadfence_block();
 *sense = s;
 *last_block = blockIdx.x;
-printf("Local barrier complete for smID %d\n", smID);
 }
 }
 __syncthreads();
