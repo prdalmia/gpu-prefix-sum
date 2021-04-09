@@ -131,6 +131,7 @@ if (atomicCAS(perSMBarr, numTBs_thisSM, 0) == numTBs_thisSM) {
 __threadfence_block();
 *sense = s;
 *last_block = blockIdx.x;
+printf("Local barrier complete for smID %d\n", smID);
 }
 }
 __syncthreads();
