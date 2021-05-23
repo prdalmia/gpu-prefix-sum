@@ -460,8 +460,8 @@ void sum_scan_blelloch(unsigned int* d_out,
 	unsigned int* d_block_sums;
 	unsigned int* d_block_sums_dummy_2;
 	unsigned int* d_block_sums_dummy;
-	long long int time;
-	long long int time_b;
+	long long int* time;
+	long long int* time_b;
 	checkCudaErrors(cudaMalloc(&d_block_sums, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMemset(d_block_sums, 0, sizeof(unsigned int) * grid_sz));
 	checkCudaErrors(cudaMalloc(&d_block_sums_dummy, sizeof(unsigned int) * grid_sz));
