@@ -366,7 +366,7 @@ void gpu_prescan(unsigned int* d_out,
     start_b = clock64();   
     grid.sync();
     stop_b = clock64();
-	if( bi == 0){
+	if( thid == 0 && blockIdx.x == 0){
 		*time_b += stop_b - start_b;
 	}
 	//if(a==len && id < gridDim.x){
