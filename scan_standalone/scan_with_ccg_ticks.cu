@@ -368,6 +368,7 @@ void gpu_prescan(unsigned int* d_out,
     stop_b = clock64();
 	if( threadIdx.x + blockDim.x*blockIdx.x == 0){
 		*time_b += stop_b - start_b;
+		printf("Doing this\n");
 	}
 	//if(a==len && id < gridDim.x){
 	//d_block_sums_2[id] = d_block_sums[id];
